@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แดชบอร์ดการเงินร้านยา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        .result-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .positive { color: #16a34a; }
+        .negative { color: #dc2626; }
+        .total { color: #2563eb; }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+        }
+        .preset-btn {
+            background-color: #e5e7eb;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 9999px;
+            transition: background-color 0.2s;
+        }
+        .preset-btn:hover {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">แดชบอร์ดการเงินสำหรับร้านยา</h1>
+            <p class="text-gray-600 mt-2">กรอกข้อมูลการเงินเพื่อคำนวณและสรุปผลภาพรวมของกิจการ</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- ส่วนของข้อมูลนำเข้า -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- รายได้ -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-green-100 text-green-600 p-3 rounded-full">
+                            <i data-lucide="trending-up" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">รายรับ (Income)</h2>
+                    </div>
+                    <div class="input-group">
+                        <label for="revenue" class="block text-gray-600 mb-1">รายได้จากการขาย (Revenue)</label>
+                        <input type="number" id="revenue" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label for="other-income" class="block text-gray-600 mb-1">รายได้อื่นๆ (Other Income)</label>
+                        <input type="number" id="other-income" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                </div>
+
+                <!-- ค่าใช้จ่าย -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-red-100 text-red-600 p-3 rounded-full">
+                            <i data-lucide="trending-down" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">รายจ่าย (Expenses)</h2>
+                    </div>
+                    <div class="input-group">
+                        <label for="cogs" class="block text-gray-600 mb-1">ต้นทุนขาย (COGS)</label>
+                        <input type="number" id="cogs" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label for="opex" class="block text-gray-600 mb-1">ค่าใช้จ่ายดำเนินงาน (OPEX)</label>
+                        <input type="number" id="opex" class="input-field" placeholder="เช่น เงินเดือน, ค่าเช่า, ค่าน้ำไฟ" onkeyup="calculate()">
+                    </div>
+                </div>
+
+                 <!-- สินทรัพย์และหนี้สิน -->
+                 <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                         <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
+                            <i data-lucide="landmark" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">สินทรัพย์และหนี้สิน</h2>
+                    </div>
+                    <div class="input-group">
+                        <label for="assets" class="block text-gray-600 mb-1">สินทรัพย์รวม (Total Assets)</label>
+                        <input type="number" id="assets" class="input-field" placeholder="เช่น เงินสด, สต็อกยา, อุปกรณ์" onkeyup="calculate()">
+                    </div>
+                    <div class="input-group">
+                        <label for="liabilities" class="block text-gray-600 mb-1">หนี้สินรวม (Total Liabilities)</label>
+                        <input type="number" id="liabilities" class="input-field" placeholder="เช่น เจ้าหนี้การค้า, เงินกู้" onkeyup="calculate()">
+                    </div>
+                </div>
+                
+                <!-- กระแสเงินสด -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                         <div class="bg-teal-100 text-teal-600 p-3 rounded-full">
+                            <i data-lucide="arrow-left-right" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">กระแสเงินสด (Cash Flow)</h2>
+                    </div>
+                    <h3 class="font-bold text-gray-600 mb-2">กิจกรรมดำเนินงาน</h3>
+                    <div class="input-group">
+                        <label for="cf-op-in" class="block text-sm text-gray-600 mb-1">เงินสดรับจากลูกค้า</label>
+                        <input type="number" id="cf-op-in" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                     <div class="input-group">
+                        <label for="cf-op-out" class="block text-sm text-gray-600 mb-1">เงินสดจ่าย (ค่าจ้าง, ซัพพลายเออร์, ค่าเช่า)</label>
+                        <input type="number" id="cf-op-out" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+
+                    <h3 class="font-bold text-gray-600 mt-4 mb-2">กิจกรรมลงทุน</h3>
+                    <div class="input-group">
+                        <label for="cf-inv-out" class="block text-sm text-gray-600 mb-1">เงินสดจ่ายลงทุน (ซื้ออุปกรณ์, สินทรัพย์)</label>
+                        <input type="number" id="cf-inv-out" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                     <div class="input-group">
+                        <label for="cf-inv-in" class="block text-sm text-gray-600 mb-1">เงินสดรับจากการขายสินทรัพย์</label>
+                        <input type="number" id="cf-inv-in" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+
+                    <h3 class="font-bold text-gray-600 mt-4 mb-2">กิจกรรมจัดหาเงิน</h3>
+                    <div class="input-group">
+                        <label for="cf-fin-in" class="block text-sm text-gray-600 mb-1">เงินสดรับจากการกู้ยืม</label>
+                        <input type="number" id="cf-fin-in" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                     <div class="input-group">
+                        <label for="cf-fin-out" class="block text-sm text-gray-600 mb-1">เงินสดจ่ายคืนเงินกู้</label>
+                        <input type="number" id="cf-fin-out" class="input-field" placeholder="0.00" onkeyup="calculate()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ส่วนของผลสรุป -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- งบกำไรขาดทุน (Profit & Loss) -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full">
+                           <i data-lucide="scale" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">สรุปงบกำไรขาดทุน (Profit & Loss)</h2>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="result-item">
+                            <span class="result-label">กำไรขั้นต้น (Gross Profit)</span>
+                            <span id="gross-profit" class="result-value">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">กำไรจากการดำเนินงาน (Operating Income)</span>
+                            <span id="operating-income" class="result-value">0.00</span>
+                        </div>
+                        <div class="result-item pt-4 border-t-2 border-gray-400 mt-2">
+                            <span class="result-label text-xl">กำไรสุทธิ (Net Income)</span>
+                            <span id="net-income" class="result-value text-xl">0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- งบดุล (Balance Sheet) -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-indigo-100 text-indigo-600 p-3 rounded-full">
+                            <i data-lucide="file-text" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">สรุปงบดุล (Balance Sheet)</h2>
+                    </div>
+                    <div class="space-y-2">
+                         <div class="result-item">
+                            <span class="result-label">สินทรัพย์รวม (Total Assets)</span>
+                            <span id="total-assets" class="result-value total">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">หนี้สินรวม (Total Liabilities)</span>
+                            <span id="total-liabilities" class="result-value negative">0.00</span>
+                        </div>
+                        <div class="result-item pt-4 border-t-2 border-gray-400 mt-2">
+                            <span class="result-label text-xl">ส่วนของผู้ถือหุ้น (Equity)</span>
+                            <span id="equity" class="result-value text-xl total">0.00</span>
+                        </div>
+                         <p class="text-sm text-gray-500 mt-4 text-center">สมการบัญชี: สินทรัพย์ = หนี้สิน + ส่วนของผู้ถือหุ้น</p>
+                    </div>
+                </div>
+                
+                <!-- งบกระแสเงินสด (Cash Flow Statement) -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-cyan-100 text-cyan-600 p-3 rounded-full">
+                            <i data-lucide="wallet" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">สรุปงบกระแสเงินสด (Cash Flow)</h2>
+                    </div>
+                    <div class="space-y-2">
+                         <div class="result-item">
+                            <span class="result-label">จากกิจกรรมดำเนินงาน</span>
+                            <span id="net-cf-op" class="result-value">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">จากกิจกรรมลงทุน</span>
+                            <span id="net-cf-inv" class="result-value">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">จากกิจกรรมจัดหาเงิน</span>
+                            <span id="net-cf-fin" class="result-value">0.00</span>
+                        </div>
+                        <div class="result-item pt-4 border-t-2 border-gray-400 mt-2">
+                            <span class="result-label text-xl">เงินสดสุทธิที่เปลี่ยนแปลง</span>
+                            <span id="net-change-in-cash" class="result-value text-xl">0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ผู้ช่วย AI -->
+                <div class="card">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="bg-purple-100 text-purple-600 p-3 rounded-full">
+                            <i data-lucide="sparkles" class="header-icon"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-700">ผู้ช่วย AI ด้านการเงิน</h2>
+                    </div>
+                    
+                    <p class="text-gray-600 mb-2">เลือกคำสั่งที่ต้องการ หรือพิมพ์เอง:</p>
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <button class="preset-btn">วิเคราะห์ภาพรวม</button>
+                        <button class="preset-btn">จุดแข็ง-จุดอ่อน?</button>
+                        <button class="preset-btn">เงินสดหมุนเวียนดีไหม?</button>
+                        <button class="preset-btn">แนะนำวิธีเพิ่มกำไร</button>
+                    </div>
+
+                    <div class="input-group">
+                        <textarea id="ai-prompt" class="input-field" rows="3" placeholder="ป้อนคำสั่งของคุณที่นี่..."></textarea>
+                    </div>
+                    <button id="ai-generate-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2 disabled:opacity-50">
+                        <span id="ai-btn-text">สร้างข้อความ</span>
+                        <div id="ai-loader" class="hidden border-4 border-t-4 border-t-white border-gray-200 rounded-full w-5 h-5 animate-spin"></div>
+                    </button>
+                    <div class="mt-6">
+                        <h3 class="font-bold text-gray-700 mb-2">ผลลัพธ์จาก AI:</h3>
+                        <div id="ai-response" class="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[100px] whitespace-pre-wrap text-gray-800">
+                            <!-- AI response will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ฟังก์ชันสำหรับแปลงตัวเลขเป็นรูปแบบสกุลเงิน
+        const formatCurrency = (num) => {
+            return new Intl.NumberFormat('th-TH', { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+        };
+
+        // ฟังก์ชันสำหรับอ่านค่าจาก Input
+        const getValue = (id) => {
+            const value = document.getElementById(id).value;
+            return parseFloat(value) || 0;
+        };
+
+        // ฟังก์ชันสำหรับตั้งค่าและสีของผลลัพธ์
+        const setResult = (id, value) => {
+            const element = document.getElementById(id);
+            element.textContent = formatCurrency(value);
+            element.classList.remove('positive', 'negative', 'total');
+            if (value > 0) {
+                element.classList.add('positive');
+            } else if (value < 0) {
+                element.classList.add('negative');
+            }
+        };
+
+        function calculate() {
+            // ดึงค่าจากฟอร์ม
+            const revenue = getValue('revenue');
+            const otherIncome = getValue('other-income');
+            const cogs = getValue('cogs');
+            const opex = getValue('opex');
+            const assets = getValue('assets');
+            const liabilities = getValue('liabilities');
+            
+            // ดึงค่ากระแสเงินสด
+            const cfOpIn = getValue('cf-op-in');
+            const cfOpOut = getValue('cf-op-out');
+            const cfInvIn = getValue('cf-inv-in');
+            const cfInvOut = getValue('cf-inv-out');
+            const cfFinIn = getValue('cf-fin-in');
+            const cfFinOut = getValue('cf-fin-out');
+
+            // --- คำนวณงบกำไรขาดทุน ---
+            const grossProfit = revenue - cogs;
+            setResult('gross-profit', grossProfit);
+
+            const operatingIncome = grossProfit - opex;
+            setResult('operating-income', operatingIncome);
+            
+            const netIncome = operatingIncome + otherIncome;
+            setResult('net-income', netIncome);
+
+            // --- คำนวณงบดุล ---
+            document.getElementById('total-assets').textContent = formatCurrency(assets);
+            document.getElementById('total-liabilities').textContent = formatCurrency(liabilities);
+            
+            const equity = assets - liabilities;
+            const equityElement = document.getElementById('equity');
+            equityElement.textContent = formatCurrency(equity);
+            equityElement.classList.remove('positive', 'negative');
+            equityElement.classList.add(equity >= 0 ? 'positive' : 'negative');
+            
+            // --- คำนวณงบกระแสเงินสด ---
+            const netCfOp = cfOpIn - cfOpOut;
+            setResult('net-cf-op', netCfOp);
+            
+            const netCfInv = cfInvIn - cfInvOut;
+            setResult('net-cf-inv', netCfInv);
+
+            const netCfFin = cfFinIn - cfFinOut;
+            setResult('net-cf-fin', netCfFin);
+            
+            const netChangeInCash = netCfOp + netCfInv + netCfFin;
+            setResult('net-change-in-cash', netChangeInCash);
+        }
+
+        // --- Refactored AI Feature ---
+        const aiButton = document.getElementById('ai-generate-btn');
+        const aiBtnText = document.getElementById('ai-btn-text');
+        const aiLoader = document.getElementById('ai-loader');
+        const aiPrompt = document.getElementById('ai-prompt');
+        const aiResponse = document.getElementById('ai-response');
+        
+        const callSecureApiProxy = async (prompt) => {
+            aiBtnText.textContent = "กำลังประมวลผล...";
+            aiLoader.classList.remove('hidden');
+            aiButton.disabled = true;
+            aiResponse.textContent = "";
+
+            try {
+                // The API call now points to the secure Netlify function
+                const response = await fetch('/.netlify/functions/api-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // The body only contains the user's prompt
+                    body: JSON.stringify({ prompt: prompt }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'An error occurred while fetching the response.');
+                }
+
+                const data = await response.json();
+                aiResponse.textContent = data.response;
+
+            } catch (error) {
+                console.error("Error calling secure API proxy:", error);
+                aiResponse.textContent = `เกิดข้อผิดพลาด: ${error.message}`;
+            } finally {
+                aiBtnText.textContent = "สร้างข้อความ";
+                aiLoader.classList.add('hidden');
+                aiButton.disabled = false;
+            }
+        };
+
+        const handleAiRequest = (userPrompt) => {
+             if (userPrompt.trim()) {
+                // Gather financial data from the result fields
+                const financialData = {
+                    grossProfit: document.getElementById('gross-profit').textContent,
+                    operatingIncome: document.getElementById('operating-income').textContent,
+                    netIncome: document.getElementById('net-income').textContent,
+                    totalAssets: document.getElementById('total-assets').textContent,
+                    totalLiabilities: document.getElementById('total-liabilities').textContent,
+                    equity: document.getElementById('equity').textContent,
+                    netCfOp: document.getElementById('net-cf-op').textContent,
+                    netCfInv: document.getElementById('net-cf-inv').textContent,
+                    netCfFin: document.getElementById('net-cf-fin').textContent,
+                    netChangeInCash: document.getElementById('net-change-in-cash').textContent
+                };
+
+                // Create a summary string to prepend to the user's prompt
+                const dataSummary = `
+ข้อมูลสรุปทางการเงินจากแดชบอร์ดมีดังนี้:
+- กำไรขั้นต้น: ${financialData.grossProfit} บาท
+- กำไรจากการดำเนินงาน: ${financialData.operatingIncome} บาท
+- กำไรสุทธิ: ${financialData.netIncome} บาท
+- สินทรัพย์รวม: ${financialData.totalAssets} บาท
+- หนี้สินรวม: ${financialData.totalLiabilities} บาท
+- ส่วนของผู้ถือหุ้น: ${financialData.equity} บาท
+- กระแสเงินสดสุทธิ (ดำเนินงาน): ${financialData.netCfOp} บาท
+- กระแสเงินสดสุทธิ (ลงทุน): ${financialData.netCfInv} บาท
+- กระแสเงินสดสุทธิ (จัดหาเงิน): ${financialData.netCfFin} บาท
+- เงินสดสุทธิที่เปลี่ยนแปลง: ${financialData.netChangeInCash} บาท
+
+---
+จากข้อมูลข้างต้น, กรุณาวิเคราะห์และตอบคำถามต่อไปนี้:
+${userPrompt}
+                `;
+                
+                callSecureApiProxy(dataSummary); // Send the combined data and prompt
+            } else {
+                aiResponse.textContent = "กรุณาป้อนคำสั่งก่อนครับ";
+            }
+        };
+
+        aiButton.addEventListener('click', () => {
+            handleAiRequest(aiPrompt.value);
+        });
+
+        // Add event listeners for new preset buttons
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const promptText = button.textContent;
+                aiPrompt.value = promptText; // Set text area value
+                handleAiRequest(promptText); // Directly call the handler
+            });
+        });
+
+        // เรียกใช้ Lucide Icons
+        lucide.createIcons();
+        
+        // คำนวณครั้งแรกเมื่อโหลดหน้าเว็บ
+        document.addEventListener('DOMContentLoaded', calculate);
+    </script>
+</body>
+</html>
+
